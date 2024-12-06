@@ -33,12 +33,22 @@
                     width: 120px;
                   color: #EEEEEE;
                 }
+                #enemy {
+                    padding-left: 10px;
+                    border-radius: 10px;
+                    position: absolute;
+                    user-select: none;
+                    font-size: 2em;
+                    width: 120px;
+                  color: #EEEEEE;
+                }
             </style>
         </head>
 
         <body>
             <div id="demo">
                 <div id="info"></div>
+                <div id="enemy"></div>
             </div>
         </body>
         <script>
@@ -48,6 +58,10 @@
                 infoElement.style.top = ypos + "px";
                 infoElement.style.left = xpos + "px";
                 infoElement.innerHTML = "<img src=\'player.png\' width=\'150px\' height=\'150px\'>";
+        const enemyElement = document.getElementById('enemy');
+                enemyElement.style.top = yEnemy + "px";
+                enemyElement.style.left = xEnemy + "px";
+                enemyElement.innerHTML = "<img src=\'player.png\' width=\'200x\' height=\'300px\'>";
             let height = window.innerHeight - 180;
             let width = window.innerWidth - 100;
             var upPressed = false;
@@ -56,6 +70,11 @@
             var rightPressed = false;
             var xvel = 0;
             var yvel = 0;
+            var yEnemy = 300;
+            var xEnemy = 800;
+            var yEnemyVel = 0;
+            var xEnemyVel = 0;
+
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'w') {
                     upPressed = true;
@@ -102,10 +121,17 @@
                 } 
                 xpos += xvel;
                 ypos += yvel;
+                yEnemy += yEnemyVel;
+                xEnemy += xEnemyVel;
                 xvel *= 0.85
                 yvel *= 0.98
+                xEnemyVel *= 0.85;
+                yEnemyVel *= 0.98;
                 infoElement.style.top = (ypos) + "px";
                 infoElement.style.left = (xpos) + "px";
+                enemyElement.style.top = (yEnemy) + "px";
+                enemyElement.style.left = (xEnemy) + "px";
+                yEnemyVel += 1;
                 if (ypos != height) {
                     yvel += 1.2
                 }
@@ -130,6 +156,16 @@
                 } else {
                     infoElement.style.transform = "scaleX(1)";
                 }
+                if (xEnemyVel > 0) {
+                    enemyElement.style.transform = "scaleX(-1)";
+                } else {
+                    enemyElement.style.transform = "scaleX(1)";
+                }
+                if (yEnemy > height - 150) {
+                    yEnemy = height - 150;
+                    yEnemyVel = 0;
+                }
+                xEnemyVel += 0.01*(xpos - xEnemy);
             }
             let intervalId = setInterval(() => movePlayer(), 30);
         </script>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+    <html>
+        <head>
+            <style>
+                * {
+                 box-sizing: border-box;
+                    padding: 0;
+                    margin: 0;
+                }
+
+                html, body {
+                    height: 100%;
+                    overflow: hidden;
+                    width: 100%;
+                    object-fit: fill;
+            
+                }
+            
+                #demo {
+                    background-image: url("underground_arena.png");
+                    background-size: 100% 100%;
+                    height: 100%;
+                    width: 100%;
+                    background-repeat: no-repeat;
+                }
+            
+                #info {
+                    padding-left: 10px;
+                    border-radius: 10px;
+                    position: absolute;
+                    user-select: none;
+                    font-size: 2em;
+                    width: 120px;
+                  color: #EEEEEE;
+                }
+            </style>
+        </head>
+
+        <body>
+            <div id="demo">
+                <div id="info"></div>
+            </div>
+        </body>
+        <script>
+        const infoElement = document.getElementById('info');
+                var xpos = 500;
+                var ypos = 300;
+                infoElement.style.top = ypos + "px";
+                infoElement.style.left = xpos + "px";
+                infoElement.innerHTML = "<img src=\'player.png\' width=\'150px\' height=\'150px\'>";
+            let height = window.innerHeight - 180;
+            let width = window.innerWidth - 100;
+            var upPressed = false;
+            var leftPressed = false;
+            var downPressed = false;
+            var rightPressed = false;
+            var xvel = 0;
+            var yvel = 0;
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'w') {
+                    upPressed = true;
+                } else if (event.key === 's') {
+                    downPressed = true;
+                } else if (event.key === 'a') {
+                    leftPressed = true;
+                } else if (event.key === 'd') {
+                    rightPressed = true;
+                }
+            });
+            document.addEventListener('keyup', (event) => {
+                if (event.key === 'w') {
+                    upPressed = false;
+                } else if (event.key === 's') {
+                    downPressed = false;
+                } else if (event.key === 'a') {
+                    leftPressed = false;
+                } else if (event.key === 'd') {
+                    rightPressed = false;
+                }
+            });
+
+            function movePlayer() {
+                if (upPressed && ypos == height) {
+                    yvel = -20;
+                } 
+                if (upPressed && xpos == -50) {
+                    xvel = 20;
+                    yvel = -30;
+                }
+                if (upPressed && xpos == width) {
+                    xvel = -20;
+                    yvel = -30;
+                }
+                if (leftPressed) {
+                    xvel -= 2;
+                }        
+                if (downPressed) {
+                    yvel += 2;
+                }        
+                if (rightPressed) {
+                    xvel += 2;
+                } 
+                xpos += xvel;
+                ypos += yvel;
+                xvel *= 0.85
+                yvel *= 0.98
+                infoElement.style.top = (ypos) + "px";
+                infoElement.style.left = (xpos) + "px";
+                if (ypos != height) {
+                    yvel += 1.2
+                }
+                if (ypos > height) {
+                    yvel = 0;
+                    ypos = height;
+                }
+                if (xpos < -50) {
+                    xvel = 0;
+                    xpos = -50;
+                }
+                if (ypos < -50) {
+                    yvel *= -0.5;
+                    ypos = -50;
+                }
+                if (xpos > width) {
+                    xvel = 0;
+                    xpos = width;
+                }
+                if (xvel > 0) {
+                    infoElement.style.transform = "scaleX(-1)";
+                } else {
+                    infoElement.style.transform = "scaleX(1)";
+                }
+            }
+            let intervalId = setInterval(() => movePlayer(), 30);
+        </script>
+</html>

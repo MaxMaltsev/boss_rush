@@ -7,7 +7,23 @@
                     padding: 0;
                     margin: 0;
                 }
-
+                @keyframes slash {
+                    0% {background-image: url("slash8.png");}
+                    7.14% {background-image: url("slash7.png");}
+                    14.3% {background-image: url("slash6.png");}
+                    28.6% {background-image: url("slash5.png");}
+                    36% {background-image: url("slash4.png");}
+                    43% {background-image: url("slash3.png");}
+                    50% {background-image: url("slash2.png");}
+                    57% {background-image: url("slash1.png");}
+                    64% {background-image: url("slash2.png");}
+                    70% {background-image: url("slash3.png");}
+                    77% {background-image: url("slash4.png");}
+                    82% {background-image: url("slash5.png");}
+                    88% {background-image: url("slash6.png");}
+                    94% {background-image: url("slash7.png");}
+                    100% {background-image: url("slash8.png");}
+                }
                 html, body {
                     height: 100%;
                     overflow: hidden;
@@ -15,9 +31,15 @@
                     object-fit: fill;
             
                 }
-            
+                #playerSlash{
+                    animation: slash 0.4s infinite;
+                    width: 100px;
+                    height: 100px;
+                    position: absolute;
+                    background-size: contain;
+                    
+                }
                 #demo {
-                    background-image: url("underground_arena.png");
                     background-size: 100% 100%;
                     height: 100%;
                     width: 100%;
@@ -49,6 +71,7 @@
             <div id="demo">
                 <div id="info"></div>
                 <div id="enemy"></div>
+                <div id="playerSlash"></div>
             </div>
         </body>
         <script>
@@ -61,7 +84,10 @@
         const enemyElement = document.getElementById('enemy');
                 enemyElement.style.top = yEnemy + "px";
                 enemyElement.style.left = xEnemy + "px";
-                enemyElement.innerHTML = "<img src=\'player.png\' width=\'200x\' height=\'300px\'>";
+                enemyElement.innerHTML = "<img src=\'player.png\' width=\'200px\' height=\'300px\'>";
+         const slashElement = document.getElementById('playerSlash');
+                slashElement.style.top = ypos + "px";
+                slashElement.style.left = xpos + "px";
             let height = window.innerHeight - 180;
             let width = window.innerWidth - 100;
             var upPressed = false;
@@ -131,6 +157,7 @@
                 infoElement.style.left = (xpos) + "px";
                 enemyElement.style.top = (yEnemy) + "px";
                 enemyElement.style.left = (xEnemy) + "px";
+                slashElement.style.top = (ypos) + "px";
                 yEnemyVel += 1;
                 if (ypos != height) {
                     yvel += 1.2
@@ -156,6 +183,13 @@
                 } else {
                     infoElement.style.transform = "scaleX(1)";
                 }
+                if (xvel > 0) {
+                    slashElement.style.left = (xpos + 40) + "px";
+                    slashElement.style.transform = "scaleX(-1)";
+                } else {
+                    slashElement.style.left = (xpos - 20) + "px";
+                    slashElement.style.transform = "scaleX(1)";
+                }
                 if (xEnemyVel > 0) {
                     enemyElement.style.transform = "scaleX(-1)";
                 } else {
@@ -166,6 +200,7 @@
                     yEnemyVel = 0;
                 }
                 xEnemyVel += 0.01*(xpos - xEnemy);
+                
             }
             let intervalId = setInterval(() => movePlayer(), 30);
         </script>

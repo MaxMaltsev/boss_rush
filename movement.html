@@ -16,13 +16,13 @@
                     43% {background-image: url("slash3.png");}
                     50% {background-image: url("slash2.png");}
                     57% {background-image: url("slash1.png");}
-                    64% {background-image: url("slash2.png");}
-                    70% {background-image: url("slash3.png");}
-                    77% {background-image: url("slash4.png");}
-                    82% {background-image: url("slash5.png");}
-                    88% {background-image: url("slash6.png");}
-                    94% {background-image: url("slash7.png");}
-                    100% {background-image: url("slash8.png");}
+                    64% {background-image: url("slash9.png");}
+                    70% {background-image: url("slash10.png");}
+                    77% {background-image: url("slash11.png");}
+                    82% {background-image: url("slash12.png");}
+                    88% {background-image: url("slash13.png");}
+                    94% {background-image: url("slash14.png");}
+                    100% {background-image: url("slash15.png");}
                 }
                 html, body {
                     height: 100%;
@@ -32,12 +32,12 @@
             
                 }
                 #playerSlash{
-                    animation: slash 0.4s infinite;
+                    animation: slash 0.4s 1;
+                    animation-play-state: paused;
                     width: 100px;
                     height: 100px;
                     position: absolute;
                     background-size: contain;
-                    
                 }
                 #demo {
                     background-size: 100% 100%;
@@ -110,6 +110,8 @@
                     leftPressed = true;
                 } else if (event.key === 'd') {
                     rightPressed = true;
+                } else if (event.key === ' ') {
+                    slashElement.style.animationPlayState = "running";
                 }
             });
             document.addEventListener('keyup', (event) => {
@@ -121,7 +123,13 @@
                     leftPressed = false;
                 } else if (event.key === 'd') {
                     rightPressed = false;
-                }
+                } 
+            });
+            slashElement.addEventListener('animationend', () => {
+                slashElement.style.animationPlayState = "paused";
+                slashElement.style.animation = 'none';  
+                slashElement.offsetHeight; 
+                slashElement.style.animation = ''; 
             });
 
             function movePlayer() {

@@ -33,7 +33,7 @@
             
                 }
                 #playerSlash{
-                    animation: slash 0.4s 1;
+                    animation: slash 0.3s 1;
                     animation-play-state: paused;
                     width: 100px;
                     height: 100px;
@@ -95,6 +95,7 @@
             var leftPressed = false;
             var downPressed = false;
             var rightPressed = false;
+            var spacePressed = false;
             var xvel = 0;
             var yvel = 0;
             var yEnemy = 300;
@@ -112,7 +113,7 @@
                 } else if (event.key === 'd') {
                     rightPressed = true;
                 } else if (event.key === ' ') {
-                    slashElement.style.animationPlayState = "running";
+                    spacePressed = true;
                 }
             });
             document.addEventListener('keyup', (event) => {
@@ -124,7 +125,9 @@
                     leftPressed = false;
                 } else if (event.key === 'd') {
                     rightPressed = false;
-                } 
+                } else if (event.key === ' ') {
+                    spacePressed = false;
+                }
             });
             slashElement.addEventListener('animationend', () => {
                 slashElement.style.animationPlayState = "paused";
@@ -200,6 +203,9 @@
                 } else {
                     slashElement.style.left = (xpos - 20) + "px";
                     slashElement.style.transform = "scaleX(1)";
+                }
+                if (spacePressed) {
+                    slashElement.style.animationPlayState = "running";
                 }
             }
 

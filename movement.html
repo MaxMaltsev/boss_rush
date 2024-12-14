@@ -133,6 +133,12 @@
                 slashElement.style.animation = ''; 
             });
 
+            function handleTick() {
+                movePlayer();
+                manageSlash();
+                moveEnemy();
+            }
+
             function movePlayer() {
                 if (upPressed && ypos == height) {
                     yvel = -20;
@@ -156,18 +162,11 @@
                 } 
                 xpos += xvel;
                 ypos += yvel;
-                yEnemy += yEnemyVel;
-                xEnemy += xEnemyVel;
                 xvel *= 0.85
                 yvel *= 0.98
-                xEnemyVel *= 0.85;
-                yEnemyVel *= 0.98;
                 infoElement.style.top = (ypos) + "px";
                 infoElement.style.left = (xpos) + "px";
-                enemyElement.style.top = (yEnemy) + "px";
-                enemyElement.style.left = (xEnemy) + "px";
                 slashElement.style.top = (ypos) + "px";
-                yEnemyVel += 1;
                 if (ypos != height) {
                     yvel += 1.2
                 }
@@ -192,6 +191,9 @@
                 } else {
                     infoElement.style.transform = "scaleX(1)";
                 }
+            }
+
+            function manageSlash() {
                 if (xvel > 0) {
                     slashElement.style.left = (xpos + 40) + "px";
                     slashElement.style.transform = "scaleX(-1)";
@@ -199,6 +201,16 @@
                     slashElement.style.left = (xpos - 20) + "px";
                     slashElement.style.transform = "scaleX(1)";
                 }
+            }
+
+            function moveEnemy() {
+                yEnemy += yEnemyVel;
+                xEnemy += xEnemyVel;
+                xEnemyVel *= 0.85;
+                yEnemyVel *= 0.98;
+                enemyElement.style.top = (yEnemy) + "px";
+                enemyElement.style.left = (xEnemy) + "px";
+                yEnemyVel += 1;
                 if (xEnemyVel > 0) {
                     enemyElement.style.transform = "scaleX(-1)";
                 } else {
@@ -209,8 +221,9 @@
                     yEnemyVel = 0;
                 }
                 xEnemyVel += 0.01*(xpos - xEnemy);
-                
+
             }
-            let intervalId = setInterval(() => movePlayer(), 30);
+
+            let intervalId = setInterval(() => handleTick(), 30);
         </script>
 </html>

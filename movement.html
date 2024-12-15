@@ -65,6 +65,13 @@
                     width: 120px;
                   color: #EEEEEE;
                 }
+                #staminaBar {
+                    margin-left: 5px;
+                    margin-top: 5px;
+                    width: 600px;
+                    height: 20px;
+                    background-color: aquamarine;
+                }
             </style>
         </head>
 
@@ -73,6 +80,7 @@
                 <div id="info"></div>
                 <div id="enemy"></div>
                 <div id="playerSlash"></div>
+                <div id="staminaBar"></div>
             </div>
         </body>
         <script>
@@ -89,6 +97,7 @@
          const slashElement = document.getElementById('playerSlash');
                 slashElement.style.top = ypos + "px";
                 slashElement.style.left = xpos + "px";
+         const staminaElement = document.getElementById('staminaBar');
             let height = window.innerHeight - 180;
             let width = window.innerWidth - 100;
             var upPressed = false;
@@ -102,6 +111,7 @@
             var xEnemy = 800;
             var yEnemyVel = 0;
             var xEnemyVel = 0;
+            var stamina = 600;
 
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'w') {
@@ -189,7 +199,7 @@
                     xvel = 0;
                     xpos = width;
                 }
-                if (xvel > 0) {
+                if (xvel > 0){
                     infoElement.style.transform = "scaleX(-1)";
                 } else {
                     infoElement.style.transform = "scaleX(1)";
@@ -197,6 +207,13 @@
             }
 
             function manageSlash() {
+                if (stamina < 600) {
+                    stamina += 3;
+                }
+                if (stamina > 600) {
+                    stamina = 600;
+                }
+                staminaElement.style.width = stamina + "px";
                 if (xvel > 0) {
                     slashElement.style.left = (xpos + 40) + "px";
                     slashElement.style.transform = "scaleX(-1)";
@@ -204,8 +221,34 @@
                     slashElement.style.left = (xpos - 20) + "px";
                     slashElement.style.transform = "scaleX(1)";
                 }
-                if (spacePressed) {
+                if (spacePressed && slashElement.style.animationPlayState != "running" && stamina >= 100) {
+                    stamina -= 100;
+                    for (let i = 0; i < 3; i++){
                     slashElement.style.animationPlayState = "running";
+                        if (stamina < 600) {
+                           stamina += 3;
+                        }
+                        if (stamina > 600) {
+                           stamina = 600;
+                        }
+                        staminaElement.style.width = stamina + "px";
+                        if (xvel > 0) {
+                           slashElement.style.left = (xpos + 40) + "px";
+                           slashElement.style.transform = "scaleX(-1)";
+                        } else {
+                           slashElement.style.left = (xpos - 20) + "px";
+                           slashElement.style.transform = "scaleX(1)";
+                        }
+                        if (xpos - 100 < xEnemy && xEnemy < xpos + 100 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                        yEnemyVel -= 5;
+                        yvel -= 5;
+                        if (xvel > 0) {
+                             xEnemyVel += 20;
+                            } else {
+                             xEnemyVel -= 20;
+                        }
+                      }
+                    }
                 }
             }
 
@@ -217,16 +260,17 @@
                 enemyElement.style.top = (yEnemy) + "px";
                 enemyElement.style.left = (xEnemy) + "px";
                 yEnemyVel += 1;
-                if (xEnemyVel > 0) {
-                    enemyElement.style.transform = "scaleX(-1)";
-                } else {
-                    enemyElement.style.transform = "scaleX(1)";
-                }
                 if (yEnemy > height - 150) {
                     yEnemy = height - 150;
                     yEnemyVel = 0;
                 }
-                xEnemyVel += 0.01*(xpos - xEnemy);
+                if (xpos > xEnemy) {
+                    xEnemyVel += 1;
+                    enemyElement.style.transform = "scaleX(-1)"
+                } else {
+                    xEnemyVel -= 1;
+                    enemyElement.style.transform = "scaleX(1)";
+                }
 
             }
 

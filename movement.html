@@ -40,6 +40,14 @@
                     position: absolute;
                     background-size: contain;
                 }
+                #enemySlash{
+                    animation: slash 0.6s 1;
+                    animation-play-state: paused;
+                    width: 150px;
+                    height: 300px;
+                    position: absolute;
+                    background-size: 100% 100%;
+                }
                 #demo {
                     background-size: 100% 100%;
                     height: 100%;
@@ -65,6 +73,13 @@
                     width: 120px;
                   color: #EEEEEE;
                 }
+                #healthBar {
+                    margin-left: 5px;
+                    margin-top: 5px;
+                    width: 900px;
+                    height: 20px;
+                    background-color: crimson;
+                }
                 #staminaBar {
                     margin-left: 5px;
                     margin-top: 5px;
@@ -80,7 +95,9 @@
                 <div id="info"></div>
                 <div id="enemy"></div>
                 <div id="playerSlash"></div>
+                <div id="healthBar"></div>
                 <div id="staminaBar"></div>
+                <div id="enemySlash"></div>
             </div>
         </body>
         <script>
@@ -98,6 +115,8 @@
                 slashElement.style.top = ypos + "px";
                 slashElement.style.left = xpos + "px";
          const staminaElement = document.getElementById('staminaBar');
+         const healthElement = document.getElementById('healthBar');
+         const enemySlash = document.getElementById('enemySlash');
             let height = window.innerHeight - 180;
             let width = window.innerWidth - 100;
             var upPressed = false;
@@ -112,7 +131,8 @@
             var yEnemyVel = 0;
             var xEnemyVel = 0;
             var stamina = 600;
-
+            var health = 900;
+            var enemyAttacking = false;
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'w') {
                     upPressed = true;
@@ -145,11 +165,18 @@
                 slashElement.offsetHeight; 
                 slashElement.style.animation = ''; 
             });
+            enemySlash.addEventListener('animationend', () => {
+                enemySlash.style.animationPlayState = "paused";
+                enemySlash.style.animation = 'none';  
+                enemySlash.offsetHeight; 
+                enemySlash.style.animation = ''; 
+            });
 
             function handleTick() {
                 movePlayer();
                 manageSlash();
                 moveEnemy();
+                manageStats();
             }
 
             function movePlayer() {
@@ -223,8 +250,8 @@
                 }
                 if (spacePressed && slashElement.style.animationPlayState != "running" && stamina >= 100) {
                     stamina -= 100;
-                    for (let i = 0; i < 3; i++){
-                    slashElement.style.animationPlayState = "running";
+                    for (let i = 0; i < 12; i++) {
+                        slashElement.style.animationPlayState = "running";
                         if (stamina < 600) {
                            stamina += 3;
                         }
@@ -233,20 +260,21 @@
                         }
                         staminaElement.style.width = stamina + "px";
                         if (xvel > 0) {
-                           slashElement.style.left = (xpos + 40) + "px";
-                           slashElement.style.transform = "scaleX(-1)";
+                            slashElement.style.left = (xpos + 40) + "px";
+                            slashElement.style.transform = "scaleX(-1)";
+                            if (xpos < xEnemy && xEnemy < xpos + 170 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                                yEnemyVel -= 1;
+                                yvel -= 0.1;
+                                xEnemyVel += 4;
+                            }
                         } else {
-                           slashElement.style.left = (xpos - 20) + "px";
-                           slashElement.style.transform = "scaleX(1)";
-                        }
-                        if (xpos - 100 < xEnemy && xEnemy < xpos + 100 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
-                        yEnemyVel -= 5;
-                        yvel -= 5;
-                        if (xvel > 0) {
-                             xEnemyVel += 20;
-                            } else {
-                             xEnemyVel -= 20;
-                        }
+                            slashElement.style.left = (xpos - 20) + "px";
+                            slashElement.style.transform = "scaleX(1)";
+                            if (xpos - 170 < xEnemy && xEnemy < xpos && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                                yEnemyVel -= 1;
+                                yvel -= 0.1;
+                                xEnemyVel -= 4;
+                            }
                       }
                     }
                 }
@@ -255,7 +283,7 @@
             function moveEnemy() {
                 yEnemy += yEnemyVel;
                 xEnemy += xEnemyVel;
-                xEnemyVel *= 0.85;
+                xEnemyVel *= 0.90;
                 yEnemyVel *= 0.98;
                 enemyElement.style.top = (yEnemy) + "px";
                 enemyElement.style.left = (xEnemy) + "px";
@@ -266,12 +294,51 @@
                 }
                 if (xpos > xEnemy) {
                     xEnemyVel += 1;
-                    enemyElement.style.transform = "scaleX(-1)"
+                    enemyElement.style.transform = "scaleX(-1)";
+                    enemySlash.style.transform = "scaleX(-1)";
                 } else {
                     xEnemyVel -= 1;
                     enemyElement.style.transform = "scaleX(1)";
+                    enemySlash.style.transform = "scaleX(1)";
                 }
+                enemySlash.style.top = (yEnemy) + "px";
+                if (xpos > xEnemy) {
+                    enemySlash.style.left = (xEnemy + 20) + "px";
+                } else {
+                    enemySlash.style.left = (xEnemy - 40) + "px";
+                }
+                        
+            }
 
+            function manageStats() {
+                healthElement.style.width = health + "px";
+                if (health < 900) {
+                    health += 0.5;
+                }
+                if (health > 900) {
+                    health = 900;
+                }
+                if (health < 0) {
+                    health = 0;
+                }
+                staminaElement.style.width = stamina + "px";
+                if (xpos - 160 < xEnemy && xEnemy < xpos + 160 && ypos - 200 < yEnemy && yEnemy < ypos + 100 && enemySlash.style.animationPlayState != "running") {
+                    enemySlash.style.animationPlayState = "running";
+                    for (let i = 0; i < 3; i++) {
+                        if (xpos - 150 < xEnemy && xEnemy < xpos + 150 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                            health -= 20;
+                            if (xEnemyVel > 0) {
+                                xvel += 25;
+                                yvel -= 5 ;
+                                xEnemyVel -= 10;
+                            } else {
+                                xvel -= 25
+                                yvel -= 5;
+                                xEnemyVel += 10;
+                            }
+                        }
+                    }
+                }
             }
 
             let intervalId = setInterval(() => handleTick(), 30);

@@ -25,12 +25,28 @@
                     94% {background-image: url("slash14.png");}
                     100% {background-image: url("slash15.png");}
                 }
+                @keyframes parry {
+                    0% {display: none;}
+                    20% {background-image: url("parry1.png"); display: block;}
+                    40% {background-image: url("parry2.png");}
+                    60% {background-image: url("parry3.png");}
+                    80% {background-image: url("parry2.png");}
+                    100% {background-image: url("parry1.png");}
+                }
                 html, body {
                     height: 100%;
                     overflow: hidden;
                     width: 100%;
                     object-fit: fill;
             
+                }
+                #playerParry{
+                    animation: parry 0.3s 1;
+                    animation-play-state: paused;
+                    width: 200px;
+                    height: 200px;
+                    position: absolute;
+                    background-size: contain;
                 }
                 #playerSlash{
                     animation: slash 0.3s 1;
@@ -41,7 +57,7 @@
                     background-size: contain;
                 }
                 #enemySlash{
-                    animation: slash 0.6s 1;
+                    animation: slash 0.3s 1;
                     animation-play-state: paused;
                     width: 150px;
                     height: 300px;
@@ -98,6 +114,7 @@
                 <div id="healthBar"></div>
                 <div id="staminaBar"></div>
                 <div id="enemySlash"></div>
+                <div id="playerParry"></div>
             </div>
         </body>
         <script>
@@ -117,6 +134,7 @@
          const staminaElement = document.getElementById('staminaBar');
          const healthElement = document.getElementById('healthBar');
          const enemySlash = document.getElementById('enemySlash');
+         const playerParry = document.getElementById('playerParry');
             let height = window.innerHeight - 180;
             let width = window.innerWidth - 100;
             var upPressed = false;
@@ -124,6 +142,8 @@
             var downPressed = false;
             var rightPressed = false;
             var spacePressed = false;
+            var parrying = false;
+            var fpressed = false;
             var xvel = 0;
             var yvel = 0;
             var yEnemy = 300;
@@ -132,6 +152,7 @@
             var xEnemyVel = 0;
             var stamina = 600;
             var health = 900;
+            var cooldown = 0;
             var enemyAttacking = false;
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'w') {
@@ -144,6 +165,8 @@
                     rightPressed = true;
                 } else if (event.key === ' ') {
                     spacePressed = true;
+                } else if (event.key === 'f') {
+                    fpressed = true;
                 }
             });
             document.addEventListener('keyup', (event) => {
@@ -157,6 +180,8 @@
                     rightPressed = false;
                 } else if (event.key === ' ') {
                     spacePressed = false;
+                } else if (event.key === 'f') {
+                    fpressed = false;
                 }
             });
             slashElement.addEventListener('animationend', () => {
@@ -170,6 +195,39 @@
                 enemySlash.style.animation = 'none';  
                 enemySlash.offsetHeight; 
                 enemySlash.style.animation = ''; 
+                if (xpos - 150 < xEnemy && xEnemy < xpos + 150 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                            if (parrying == false) {
+                            health -= 100;
+                            if (xEnemyVel > 0) {
+                                xvel += 25;
+                                yvel -= 5 ;
+                                xEnemyVel -= 10;
+                            } else {
+                                xvel -= 25
+                                yvel -= 5;
+                                xEnemyVel += 10;
+                            }
+                           } else {
+                            cooldown += 30;
+                            if (xEnemyVel > 0) {
+                                xvel -= 5;
+                                yvel -= 2 ;
+                                xEnemyVel -= 25;
+                            } else {
+                                xvel += 5
+                                yvel -= 2;
+                                xEnemyVel += 25;
+                            }
+                           }
+                        }
+            });
+            playerParry.addEventListener('animationend', () => {
+                playerParry.style.animationPlayState = "paused";
+                playerParry.style.animation = 'none';  
+                playerParry.offsetHeight; 
+                playerParry.style.animation = ''; 
+                parrying = false;
+                fpressed = false;
             });
 
             function handleTick() {
@@ -200,6 +258,11 @@
                 if (rightPressed) {
                     xvel += 2;
                 } 
+                if (fpressed && stamina > 100 && parrying != true) {
+                    parrying = true;
+                    playerParry.style.animationPlayState = "running";
+                    stamina -= 100;
+                }
                 xpos += xvel;
                 ypos += yvel;
                 xvel *= 0.85
@@ -234,11 +297,16 @@
             }
 
             function manageSlash() {
+                playerParry.style.top = (ypos - 15) + "px";
+                playerParry.style.left = (xpos - 30) + "px";
                 if (stamina < 600) {
                     stamina += 3;
                 }
                 if (stamina > 600) {
                     stamina = 600;
+                }
+                if (parrying) {
+
                 }
                 staminaElement.style.width = stamina + "px";
                 if (xvel > 0) {
@@ -262,7 +330,7 @@
                         if (xvel > 0) {
                             slashElement.style.left = (xpos + 40) + "px";
                             slashElement.style.transform = "scaleX(-1)";
-                            if (xpos < xEnemy && xEnemy < xpos + 170 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                            if (xpos < xEnemy && xEnemy < xpos + 100 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
                                 yEnemyVel -= 1;
                                 yvel -= 0.1;
                                 xEnemyVel += 4;
@@ -270,7 +338,7 @@
                         } else {
                             slashElement.style.left = (xpos - 20) + "px";
                             slashElement.style.transform = "scaleX(1)";
-                            if (xpos - 170 < xEnemy && xEnemy < xpos && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                            if (xpos - 100 < xEnemy && xEnemy < xpos && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
                                 yEnemyVel -= 1;
                                 yvel -= 0.1;
                                 xEnemyVel -= 4;
@@ -292,11 +360,11 @@
                     yEnemy = height - 150;
                     yEnemyVel = 0;
                 }
-                if (xpos > xEnemy) {
+                if (xpos - 150 > xEnemy) {
                     xEnemyVel += 1;
                     enemyElement.style.transform = "scaleX(-1)";
                     enemySlash.style.transform = "scaleX(-1)";
-                } else {
+                } else if (xpos + 150 < xEnemy){
                     xEnemyVel -= 1;
                     enemyElement.style.transform = "scaleX(1)";
                     enemySlash.style.transform = "scaleX(1)";
@@ -312,6 +380,10 @@
 
             function manageStats() {
                 healthElement.style.width = health + "px";
+                cooldown -= 1;
+                if (cooldown < 0) {
+                    cooldown = 0;
+                }
                 if (health < 900) {
                     health += 0.5;
                 }
@@ -322,24 +394,10 @@
                     health = 0;
                 }
                 staminaElement.style.width = stamina + "px";
-                if (xpos - 160 < xEnemy && xEnemy < xpos + 160 && ypos - 200 < yEnemy && yEnemy < ypos + 100 && enemySlash.style.animationPlayState != "running") {
+                if (xpos - 160 < xEnemy && xEnemy < xpos + 160 && ypos - 200 < yEnemy && yEnemy < ypos + 100 && cooldown <= 0) {
                     enemySlash.style.animationPlayState = "running";
-                    for (let i = 0; i < 3; i++) {
-                        if (xpos - 150 < xEnemy && xEnemy < xpos + 150 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
-                            health -= 20;
-                            if (xEnemyVel > 0) {
-                                xvel += 25;
-                                yvel -= 5 ;
-                                xEnemyVel -= 10;
-                            } else {
-                                xvel -= 25
-                                yvel -= 5;
-                                xEnemyVel += 10;
-                            }
-                        }
                     }
                 }
-            }
 
             let intervalId = setInterval(() => handleTick(), 30);
         </script>

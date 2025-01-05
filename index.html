@@ -152,7 +152,8 @@
             var xEnemyVel = 0;
             var stamina = 600;
             var health = 900;
-            var cooldown = 0;
+            var stun = 0;
+            var posture = 50;
             var enemyAttacking = false;
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'w') {
@@ -208,15 +209,13 @@
                                 xEnemyVel += 10;
                             }
                            } else {
-                            cooldown += 30;
+                            posture -= 10;
                             if (xEnemyVel > 0) {
                                 xvel -= 5;
                                 yvel -= 2 ;
-                                xEnemyVel -= 25;
                             } else {
                                 xvel += 5
                                 yvel -= 2;
-                                xEnemyVel += 25;
                             }
                            }
                         }
@@ -379,8 +378,17 @@
             }
 
             function manageStats() {
+                if(stun == 1) {
+                    posture = 50;
+                }
+                if(stun < 0) {
+                    stun = 0;
+                }
+                if(posture <= 0) {
+                    stun = 1000;
+                }
                 healthElement.style.width = health + "px";
-                cooldown -= 1;
+                stun -= 1;
                 if (cooldown < 0) {
                     cooldown = 0;
                 }
@@ -394,7 +402,7 @@
                     health = 0;
                 }
                 staminaElement.style.width = stamina + "px";
-                if (xpos - 160 < xEnemy && xEnemy < xpos + 160 && ypos - 200 < yEnemy && yEnemy < ypos + 100 && cooldown <= 0) {
+                if (xpos - 160 < xEnemy && xEnemy < xpos + 160 && ypos - 200 < yEnemy && yEnemy < ypos + 100 && stun <= 0) {
                     enemySlash.style.animationPlayState = "running";
                     }
                 }

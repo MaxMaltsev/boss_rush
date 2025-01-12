@@ -103,6 +103,12 @@
                     height: 20px;
                     background-color: aquamarine;
                 }
+                #shockwave {
+                    width: 256px;
+                    height: 64px;
+                    background-image: url("shockwave.png");
+                    position: absolute;
+                }
             </style>
         </head>
 
@@ -115,6 +121,7 @@
                 <div id="staminaBar"></div>
                 <div id="enemySlash"></div>
                 <div id="playerParry"></div>
+                <div id="shockwave"></div>
             </div>
         </body>
         <script>
@@ -135,8 +142,10 @@
          const healthElement = document.getElementById('healthBar');
          const enemySlash = document.getElementById('enemySlash');
          const playerParry = document.getElementById('playerParry');
+         const shockwaveElement = document.getElementById('shockwave');
             let height = window.innerHeight - 180;
             let width = window.innerWidth - 100;
+            var shockwaveTime = 0;
             var upPressed = false;
             var leftPressed = false;
             var downPressed = false;
@@ -155,6 +164,8 @@
             var stun = 0;
             var posture = 50;
             var enemyAttacking = false;
+            var attacknum = 0;
+            var shockwaveSize = 0;
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'w') {
                     upPressed = true;
@@ -199,7 +210,7 @@
                 if (xpos - 150 < xEnemy && xEnemy < xpos + 150 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
                             if (parrying == false) {
                             health -= 100;
-                            if (xEnemyVel > 0) {
+                            if (xEnemy < xpos) {
                                 xvel += 25;
                                 yvel -= 5 ;
                                 xEnemyVel -= 10;
@@ -210,12 +221,14 @@
                             }
                            } else {
                             posture -= 10;
-                            if (xEnemyVel > 0) {
+                            if (xEnemy < xpos) {
                                 xvel -= 5;
                                 yvel -= 2 ;
+                                xEnemyVel -= 15;
                             } else {
                                 xvel += 5
                                 yvel -= 2;
+                                xEnemyVel += 15;
                             }
                            }
                         }
@@ -296,8 +309,12 @@
             }
 
             function manageSlash() {
-                playerParry.style.top = (ypos - 15) + "px";
-                playerParry.style.left = (xpos - 30) + "px";
+                if (shockwaveTime <= 0) {
+                    shockwaveElement.style.top = (yEnemy + 250) + "px";
+                    shockwaveElement.style.display = "none";
+                }
+                    playerParry.style.top = (ypos - 15) + "px";
+                    playerParry.style.left = (xpos - 30) + "px";
                 if (stamina < 600) {
                     stamina += 3;
                 }
@@ -355,18 +372,33 @@
                 enemyElement.style.top = (yEnemy) + "px";
                 enemyElement.style.left = (xEnemy) + "px";
                 yEnemyVel += 1;
+                if (yEnemyVel >= 30 && yEnemy > height - 150) {
+                    yEnemyVel = 0;
+                    shockwaveTime += 50;
+                }
                 if (yEnemy > height - 150) {
                     yEnemy = height - 150;
                     yEnemyVel = 0;
                 }
-                if (xpos - 150 > xEnemy) {
+                if (yEnemy < 200 && yEnemyVel >= 0) {
+                    yEnemyVel = 30;
+                }
+                if (stun <= 0) {
+                  if (xpos - 150 > xEnemy) {
+                    if (shockwaveTime <= 0) {
+                    shockwaveElement.style.left = (xEnemy - 100) + "px";
+                    }
                     xEnemyVel += 1;
                     enemyElement.style.transform = "scaleX(-1)";
                     enemySlash.style.transform = "scaleX(-1)";
-                } else if (xpos + 150 < xEnemy){
+                   } else if (xpos + 150 < xEnemy){
+                    if (shockwaveTime <= 0) {
+                    shockwaveElement.style.left = (xEnemy - 40) + "px";
+                    }
                     xEnemyVel -= 1;
                     enemyElement.style.transform = "scaleX(1)";
                     enemySlash.style.transform = "scaleX(1)";
+                   }
                 }
                 enemySlash.style.top = (yEnemy) + "px";
                 if (xpos > xEnemy) {
@@ -378,19 +410,27 @@
             }
 
             function manageStats() {
+                shockwaveSize = 50 - shockwaveTime;
+                attacknum = Math.floor(10*Math.random()+1);
+                if(shockwaveTime > 0) {
+                    shockwaveTime -= 1;
+                    shockwaveElement.style.display = "block";
+                    shockwaveElement.style.transform = "scaleX("+ (shockwaveSize/5) +")";
+                }
                 if(stun == 1) {
                     posture = 50;
                 }
                 if(stun < 0) {
                     stun = 0;
                 }
-                if(posture <= 0) {
-                    stun = 1000;
+                if(posture <= 0 && posture != -1) {
+                    stun = 100;
+                    posture = -1;
                 }
                 healthElement.style.width = health + "px";
                 stun -= 1;
-                if (cooldown < 0) {
-                    cooldown = 0;
+                if (stun < 0) {
+                    stun = 0;
                 }
                 if (health < 900) {
                     health += 0.5;
@@ -402,10 +442,15 @@
                     health = 0;
                 }
                 staminaElement.style.width = stamina + "px";
-                if (xpos - 160 < xEnemy && xEnemy < xpos + 160 && ypos - 200 < yEnemy && yEnemy < ypos + 100 && stun <= 0) {
+                if (xpos - 160 < xEnemy && xEnemy < xpos + 160 && ypos - 200 < yEnemy && yEnemy < ypos + 100 && stun <= 0 && enemySlash.style.animationPlayState != "running") {
+                    if (attacknum < 10) {
                     enemySlash.style.animationPlayState = "running";
+                    } else if(shockwaveTime <= 0){
+                        yEnemyVel -= 30;
                     }
                 }
+                }
+              
 
             let intervalId = setInterval(() => handleTick(), 30);
         </script>

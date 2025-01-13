@@ -374,7 +374,7 @@
                 yEnemyVel += 1;
                 if (yEnemyVel >= 30 && yEnemy > height - 150) {
                     yEnemyVel = 0;
-                    shockwaveTime += 50;
+                    shockwaveTime += 25;
                 }
                 if (yEnemy > height - 150) {
                     yEnemy = height - 150;
@@ -410,12 +410,13 @@
             }
 
             function manageStats() {
-                shockwaveSize = 50 - shockwaveTime;
+                shockwaveSize = 25 - shockwaveTime;
                 attacknum = Math.floor(10*Math.random()+1);
                 if(shockwaveTime > 0) {
-                    shockwaveTime -= 1;
+                    shockwaveElement.style.opacity = (shockwaveTime/25) + "";
                     shockwaveElement.style.display = "block";
-                    shockwaveElement.style.transform = "scaleX("+ (shockwaveSize/5) +")";
+                    shockwaveElement.style.transform = "scaleX("+ (shockwaveSize/2) +")";
+                    shockwaveTime -= 1;
                 }
                 if(stun == 1) {
                     posture = 50;
@@ -442,8 +443,8 @@
                     health = 0;
                 }
                 staminaElement.style.width = stamina + "px";
-                if (xpos - 160 < xEnemy && xEnemy < xpos + 160 && ypos - 200 < yEnemy && yEnemy < ypos + 100 && stun <= 0 && enemySlash.style.animationPlayState != "running") {
-                    if (attacknum < 10) {
+                if (xpos - 160 < xEnemy && xEnemy < xpos + 160 && ypos - 200 < yEnemy && yEnemy < ypos + 100 && stun <= 0 && enemySlash.style.animationPlayState != "running" && shockwaveTime <= 0) {
+                    if (attacknum < 9) {
                     enemySlash.style.animationPlayState = "running";
                     } else if(shockwaveTime <= 0){
                         yEnemyVel -= 30;

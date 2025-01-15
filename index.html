@@ -143,6 +143,8 @@
          const enemySlash = document.getElementById('enemySlash');
          const playerParry = document.getElementById('playerParry');
          const shockwaveElement = document.getElementById('shockwave');
+         const playerHitbox = infoElement.getBoundingClientRect();
+         const shockwaveHitbox = shockwaveElement.getBoundingClientRect();
             let height = window.innerHeight - 180;
             let width = window.innerWidth - 100;
             var shockwaveTime = 0;
@@ -374,7 +376,7 @@
                 yEnemyVel += 1;
                 if (yEnemyVel >= 30 && yEnemy > height - 150) {
                     yEnemyVel = 0;
-                    shockwaveTime += 25;
+                    shockwaveTime += 10;
                 }
                 if (yEnemy > height - 150) {
                     yEnemy = height - 150;
@@ -410,13 +412,21 @@
             }
 
             function manageStats() {
+                var shockwaveEdgeLeft = parseInt(shockwaveElement.style.left, 10) - (64*shockwaveSize);
+                var shockwaveEdgeRight = parseInt(shockwaveElement.style.left, 10) + (64*shockwaveSize)
                 shockwaveSize = 25 - shockwaveTime;
                 attacknum = Math.floor(10*Math.random()+1);
                 if(shockwaveTime > 0) {
-                    shockwaveElement.style.opacity = (shockwaveTime/25) + "";
-                    shockwaveElement.style.display = "block";
-                    shockwaveElement.style.transform = "scaleX("+ (shockwaveSize/2) +")";
-                    shockwaveTime -= 1;
+                if (shockwaveEdgeLeft < xpos && shockwaveEdgeRight > xpos) {
+                if (ypos > (height - 50) && parrying != true) {
+                yvel -= 20;
+                health -= 100;  
+                }
+                }
+                shockwaveElement.style.opacity = (shockwaveTime/25) + "";
+                shockwaveElement.style.display = "block";
+                shockwaveElement.style.transform = "scaleX("+ (shockwaveSize/2) +")";
+                shockwaveTime -= 1;
                 }
                 if(stun == 1) {
                     posture = 50;

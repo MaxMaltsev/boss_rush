@@ -349,17 +349,29 @@
                             slashElement.style.left = (xpos + 40) + "px";
                             slashElement.style.transform = "scaleX(-1)";
                             if (xpos < xEnemy && xEnemy < xpos + 100 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                                if (stun > 0 ){
                                 yEnemyVel -= 1;
                                 yvel -= 0.1;
-                                xEnemyVel += 4;
+                                xEnemyVel += 1;
+                                } else {
+                                    yEnemyVel -= 0.1;
+                                    yvel -= 1;
+                                    xvel -= 1;
+                                }
                             }
                         } else {
                             slashElement.style.left = (xpos - 20) + "px";
                             slashElement.style.transform = "scaleX(1)";
                             if (xpos - 100 < xEnemy && xEnemy < xpos && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                                if (stun > 0 ){
                                 yEnemyVel -= 1;
                                 yvel -= 0.1;
-                                xEnemyVel -= 4;
+                                xEnemyVel -= 1;
+                                } else {
+                                    yEnemyVel -= 0.1;
+                                    yvel -= 1;
+                                    xvel += 1;
+                                }
                             }
                       }
                     }

@@ -249,6 +249,34 @@
                 manageSlash();
                 moveEnemy();
                 manageStats();
+                manageSplats();
+            }
+
+            function splat() {
+                var splatSize = 2*Math.random() + 1;
+                var bloodElement = document.createElement("div");
+                bloodElement.classList.add('splat'); 
+                bloodElement.creationTime = Date.now();
+                document.body.appendChild(bloodElement);
+                bloodElement.innerHTML = "<img src=\'Blood-splatter.png\' width=\'128px\' height=\'128px\'>";
+                bloodElement.style.position = "absolute";
+                bloodElement.style.top = yEnemy + (200*Math.random()) + "px";
+                bloodElement.style.left = xEnemy - 100 + (200*Math.random()) + "px";
+                bloodElement.style.transform = "rotate("+ (360*Math.random()) + "deg) scale("+ splatSize + "," + splatSize + ")";
+            }
+
+            function manageSplats() {
+                var splats = document.getElementsByClassName("splat");
+                const SPLAT_LIFETIME = 2000;
+                const time = Date.now();
+                for (const splat of splats) {
+                    const sinceCreation = time - splat.creationTime;
+                    if (sinceCreation > SPLAT_LIFETIME) {
+                        splat.remove();
+                    } else {
+                        splat.style.opacity = (SPLAT_LIFETIME - sinceCreation) / SPLAT_LIFETIME;
+                    }
+                }
             }
 
             function movePlayer() {
@@ -336,7 +364,7 @@
                 }
                 if (spacePressed && slashElement.style.animationPlayState != "running" && stamina >= 100) {
                     stamina -= 100;
-                    for (let i = 0; i < 12; i++) {
+                    for (let i = 0; i < 3; i++) {
                         slashElement.style.animationPlayState = "running";
                         if (stamina < 600) {
                            stamina += 3;
@@ -344,15 +372,17 @@
                         if (stamina > 600) {
                            stamina = 600;
                         }
+                
                         staminaElement.style.width = stamina + "px";
                         if (xvel > 0) {
                             slashElement.style.left = (xpos + 40) + "px";
                             slashElement.style.transform = "scaleX(-1)";
-                            if (xpos < xEnemy && xEnemy < xpos + 100 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                            if (xpos - 50 < xEnemy && xEnemy < xpos + 100 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
                                 if (stun > 0 ){
                                 yEnemyVel -= 1;
                                 yvel -= 0.1;
                                 xEnemyVel += 1;
+                                splat();
                                 } else {
                                     yEnemyVel -= 0.1;
                                     yvel -= 1;
@@ -362,11 +392,12 @@
                         } else {
                             slashElement.style.left = (xpos - 20) + "px";
                             slashElement.style.transform = "scaleX(1)";
-                            if (xpos - 100 < xEnemy && xEnemy < xpos && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                            if (xpos - 100 < xEnemy && xEnemy < xpos + 50 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
                                 if (stun > 0 ){
                                 yEnemyVel -= 1;
                                 yvel -= 0.1;
                                 xEnemyVel -= 1;
+                                splat();
                                 } else {
                                     yEnemyVel -= 0.1;
                                     yvel -= 1;

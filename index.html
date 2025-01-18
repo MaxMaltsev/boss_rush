@@ -223,6 +223,9 @@
                             }
                            } else {
                             posture -= 10;
+                            for(i = 0; i < 5; i++) {
+                            blockParticle();
+                            }
                             if (xEnemy < xpos) {
                                 xvel -= 5;
                                 yvel -= 2 ;
@@ -250,6 +253,7 @@
                 moveEnemy();
                 manageStats();
                 manageSplats();
+                manageSparks();
             }
 
             function splat() {
@@ -264,6 +268,24 @@
                 bloodElement.style.left = xEnemy - 100 + (200*Math.random()) + "px";
                 bloodElement.style.transform = "rotate("+ (360*Math.random()) + "deg) scale("+ splatSize + "," + splatSize + ")";
             }
+            function blockParticle() {
+                var sparkSize = Math.random() + 1;
+                var sparkElement = document.createElement("div");
+                var sparkElement2 = document.createElement("div");
+                sparkElement.classList.add('spark'); 
+                sparkElement.creationTime = Date.now();
+                sparkElement.angle = 360*Math.random();
+                document.body.appendChild(sparkElement);
+                sparkElement.innerHTML = "<img src=\'parry2.png\' width=\'64px\' height=\'64px\'>";
+                sparkElement.style.position = "absolute";
+                sparkElement.style.top = parseInt(slashElement.style.top) + "px";
+                if (xpos < xEnemy) {
+                sparkElement.style.left = parseInt(enemyElement.style.left) - 30 + "px";
+                } else {
+                sparkElement.style.left = parseInt(enemyElement.style.left) + 50 + "px";
+                }
+                sparkElement.style.transform = "rotate("+ (360*Math.random()) + "deg) scale("+ sparkSize + "," + sparkSize + ")";
+            }
 
             function manageSplats() {
                 var splats = document.getElementsByClassName("splat");
@@ -275,6 +297,21 @@
                         splat.remove();
                     } else {
                         splat.style.opacity = (SPLAT_LIFETIME - sinceCreation) / SPLAT_LIFETIME;
+                    }
+                }
+            }
+            function manageSparks() {
+                var sparks = document.getElementsByClassName("spark");
+                const SPARK_LIFETIME = 400;
+                const time = Date.now();
+                for (const spark of sparks) {
+                    const sinceCreation = time - spark.creationTime;
+                    if (sinceCreation > SPARK_LIFETIME) {
+                        spark.remove();
+                    } else {
+                        spark.style.opacity = (SPARK_LIFETIME - sinceCreation) / SPARK_LIFETIME;
+                        spark.style.left = parseInt(spark.style.left) + 50*(Math.cos(spark.angle))/(sinceCreation/20 + 1) + "px";
+                        spark.style.top = parseInt(spark.style.top) + 50*(Math.sin(spark.angle))/(sinceCreation/20 + 1) + "px";
                     }
                 }
             }
@@ -377,13 +414,14 @@
                         if (xvel > 0) {
                             slashElement.style.left = (xpos + 40) + "px";
                             slashElement.style.transform = "scaleX(-1)";
-                            if (xpos - 50 < xEnemy && xEnemy < xpos + 100 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                            if (xpos - 50 < xEnemy && xEnemy < xpos + 200 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
                                 if (stun > 0 ){
                                 yEnemyVel -= 1;
                                 yvel -= 0.1;
                                 xEnemyVel += 1;
                                 splat();
                                 } else {
+                                    blockParticle();
                                     yEnemyVel -= 0.1;
                                     yvel -= 1;
                                     xvel -= 1;
@@ -392,13 +430,14 @@
                         } else {
                             slashElement.style.left = (xpos - 20) + "px";
                             slashElement.style.transform = "scaleX(1)";
-                            if (xpos - 100 < xEnemy && xEnemy < xpos + 50 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
+                            if (xpos - 200 < xEnemy && xEnemy < xpos + 50 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
                                 if (stun > 0 ){
                                 yEnemyVel -= 1;
                                 yvel -= 0.1;
                                 xEnemyVel -= 1;
                                 splat();
                                 } else {
+                                    blockParticle();
                                     yEnemyVel -= 0.1;
                                     yvel -= 1;
                                     xvel += 1;

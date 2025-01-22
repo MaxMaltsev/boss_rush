@@ -96,6 +96,14 @@
                     height: 20px;
                     background-color: crimson;
                 }
+                #enemyHealthBar {
+                    margin-left: 5px;
+                    margin-top: 5px;
+                    width: 250px;
+                    height: 15px;
+                    background-color: crimson;
+                    position: absolute;
+                }
                 #staminaBar {
                     margin-left: 5px;
                     margin-top: 5px;
@@ -122,6 +130,7 @@
                 <div id="enemySlash"></div>
                 <div id="playerParry"></div>
                 <div id="shockwave"></div>
+                <div id="enemyHealthBar"></div>
             </div>
         </body>
         <script>
@@ -145,6 +154,7 @@
          const shockwaveElement = document.getElementById('shockwave');
          const playerHitbox = infoElement.getBoundingClientRect();
          const shockwaveHitbox = shockwaveElement.getBoundingClientRect();
+         const enemyHealthBar = document.getElementById('enemyHealthBar');
             let height = window.innerHeight - 180;
             let width = window.innerWidth - 100;
             var shockwaveTime = 0;
@@ -168,6 +178,7 @@
             var enemyAttacking = false;
             var attacknum = 0;
             var shockwaveSize = 0;
+            var enemyHp = 1000;
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'w') {
                     upPressed = true;
@@ -420,6 +431,7 @@
                                 yvel -= 0.1;
                                 xEnemyVel += 1;
                                 splat();
+                                enemyHp -= 10;
                                 } else {
                                     blockParticle();
                                     yEnemyVel -= 0.1;
@@ -436,6 +448,7 @@
                                 yvel -= 0.1;
                                 xEnemyVel -= 1;
                                 splat();
+                                enemyHp -= 10;
                                 } else {
                                     blockParticle();
                                     yEnemyVel -= 0.1;
@@ -498,6 +511,11 @@
                 var shockwaveEdgeRight = parseInt(shockwaveElement.style.left, 10) + (64*shockwaveSize)
                 shockwaveSize = 25 - shockwaveTime;
                 attacknum = Math.floor(10*Math.random()+1);
+                if (enemyElement.style.transform == "scaleX(-1)") {
+                    enemyHealthBar.style.left = xEnemy - (enemyHp/10) + 85 + "px";
+                } else {
+                    enemyHealthBar.style.left = xEnemy - (enemyHp/10) + 125 + "px";
+                }
                 if(shockwaveTime > 0) {
                 if (shockwaveEdgeLeft < xpos && shockwaveEdgeRight > xpos) {
                 if (ypos > (height - 50) && parrying != true) {
@@ -522,6 +540,8 @@
                 }
                 healthElement.style.width = health + "px";
                 stun -= 1;
+                enemyHealthBar.style.width = (enemyHp/10) + "px";
+                enemyHealthBar.style.top = yEnemy + "px";
                 if (stun < 0) {
                     stun = 0;
                 }

@@ -33,6 +33,11 @@
                     80% {background-image: url("parry2.png");}
                     100% {background-image: url("parry1.png");}
                 }
+                @keyframes spin {
+                    0% {transform: rotate(0deg); left: 0px;}
+                    50% {transform: rotate(360deg); left: 500px;}
+                    100% {transform: rotate(0deg); left: 0px;}
+                }
                 html, body {
                     height: 100%;
                     overflow: hidden;
@@ -133,6 +138,14 @@
                     margin-left: 5px;
                     background-color: lightblue;
                 }
+                #winMessage {
+                    top: 200px;
+                    width: 1000px;
+                    height: 250px;
+                    position: absolute;
+                    background-image: url("WinMessage.png");
+                    animation: spin 2s infinite;
+                }
             </style>
         </head>
 
@@ -149,6 +162,7 @@
                 <div id="enemyHealthBar"></div>
                 <div id="playerHeavy"></div>
                 <div id="heavyCooldownBar">&nbsp</div>
+                <div id="winMessage"></div>
             </div>
         </body>
         <script>
@@ -175,6 +189,8 @@
          const enemyHealthBar = document.getElementById('enemyHealthBar');
          const playerHeavy = document.getElementById('playerHeavy');
          const heavyCooldownBar = document.getElementById('heavyCooldownBar');
+         const winMessage = document.getElementById('winMessage');
+            winMessage.style.display = "none";
             let height = window.innerHeight - 180;
             let width = window.innerWidth - 100;
             var shockwaveTime = 0;
@@ -608,6 +624,7 @@
                 if (enemyHp < 0) {
                     enemyElement.remove();
                     yEnemy = -1000;
+                    winMessage.style.display = "block";
                 }
                 heavyCooldownBar.style.width = heavyCooldown + "px";
                 if (heavyCooldown > 0) {

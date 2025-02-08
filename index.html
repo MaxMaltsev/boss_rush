@@ -446,18 +446,30 @@
                 if (stamina > 600) {
                     stamina = 600;
                 }
-                if (parrying) {
-
-                }
                 staminaElement.style.width = stamina + "px";
                 if (xvel > 0) {
                     if (usingHeavy == true) {
                         xvel += 5;
                         if (xpos - 50 < xEnemy && xEnemy < xpos + 50 && ypos - 100 < yEnemy < ypos + 50) {
                             if (enemyHitHeavy == false) {
-                            enemyHitHeavy = true;
-                            xEnemyVel += 120;
-                            yEnemyVel -= 10;
+                               if (stun > 0){
+                                    enemyHitHeavy = true;
+                                   for(i = 0; i < 6; i++){
+                                        splat();
+                                    }
+                                    enemyHp -= 100;
+                                    xEnemyVel += 120;
+                                    yEnemyVel -= 10;
+                                } else {
+                                    enemyHitHeavy = true;
+                                    for(i = 0; i < 6; i++){
+                                        blockParticle();
+                                    }
+                                    posture -= 20;
+                                    enemyHp -= 10;
+                                    xEnemyVel += 12;
+                                    yEnemyVel -= 3;
+                                }
                             }
                         }
                     }
@@ -470,9 +482,24 @@
                         xvel -= 5;
                         if (xpos - 50 < xEnemy && xEnemy < xpos + 50 && ypos - 100 < yEnemy < ypos + 50) {
                             if (enemyHitHeavy == false) {
-                            enemyHitHeavy = true;
-                            xEnemyVel -= 120;
-                            yEnemyVel -= 10;
+                                if (stun > 0){
+                                    enemyHitHeavy = true;
+                                   for(i = 0; i < 6; i++){
+                                        splat();
+                                    }
+                                    enemyHp -= 100;
+                                    xEnemyVel -= 120;
+                                    yEnemyVel -= 10;
+                                } else {
+                                    enemyHitHeavy = true;
+                                    for(i = 0; i < 6; i++){
+                                        blockParticle();
+                                    }
+                                    posture -= 20;
+                                    enemyHp -= 10;
+                                    xEnemyVel -= 12;
+                                    yEnemyVel -= 3;
+                                }
                             }
                         } 
                     }
@@ -578,6 +605,10 @@
             }
 
             function manageStats() {
+                if (enemyHp < 0) {
+                    enemyElement.remove();
+                    yEnemy = -1000;
+                }
                 heavyCooldownBar.style.width = heavyCooldown + "px";
                 if (heavyCooldown > 0) {
                      heavyCooldown -= 1;

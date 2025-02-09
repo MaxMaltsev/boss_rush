@@ -621,6 +621,9 @@
             }
 
             function manageStats() {
+                if (health <= 0) {
+                    location.reload();
+                }
                 if (enemyHp < 0) {
                     enemyElement.remove();
                     yEnemy = -1000;

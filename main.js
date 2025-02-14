@@ -51,6 +51,7 @@ var epressed = false;
 var usingHeavy = false;
 var heavyCooldown = 0;
 var enemyHitHeavy = false;
+var facingDirection = 0;
 document.addEventListener('keydown', (event) => {
     if (event.key === 'w') {
         upPressed = true;
@@ -67,7 +68,6 @@ document.addEventListener('keydown', (event) => {
     } else if (event.key === 'e') {
         epressed = true;
     }
-
 });
 document.addEventListener('keyup', (event) => {
     if (event.key === 'w') {
@@ -371,36 +371,27 @@ function manageSlash() {
             if (xvel > 0) {
                 slashElement.style.left = (xpos + 40) + "px";
                 slashElement.style.transform = "scaleX(-1)";
-                if (xpos - 50 < xEnemy && xEnemy < xpos + 200 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
-                    if (stun > 0) {
-                        yEnemyVel -= 1;
-                        yvel -= 0.1;
-                        xEnemyVel += 1;
-                        splat();
-                        enemyHp -= 10;
-                    } else {
-                        blockParticle();
-                        yEnemyVel -= 0.1;
-                        yvel -= 1;
-                        xvel -= 1;
-                    }
-                }
+                facingDirection = 1;
             } else {
                 slashElement.style.left = (xpos - 20) + "px";
                 slashElement.style.transform = "scaleX(1)";
-                if (xpos - 200 < xEnemy && xEnemy < xpos + 50 && ypos - 200 < yEnemy && yEnemy < ypos + 100) {
-                    if (stun > 0) {
-                        yEnemyVel -= 1;
-                        yvel -= 0.1;
-                        xEnemyVel -= 1;
-                        splat();
-                        enemyHp -= 10;
-                    } else {
-                        blockParticle();
-                        yEnemyVel -= 0.1;
-                        yvel -= 1;
-                        xvel += 1;
-                    }
+                facingDirection = -1;
+            }
+            var leftDelta = 125 - 75 * facingDirection;
+            var rightDelta = 125 + 75 * facingDirection;
+            if (xpos - leftDelta < xEnemy && xpos + rightDelta > xEnemy
+                && ypos - 200 < yEnemy && ypos + 100 > yEnemy) {
+                if (stun > 0) {
+                    yEnemyVel -= 1;
+                    yvel -= 0.1;
+                    xEnemyVel += facingDirection;
+                    splat();
+                    enemyHp -= 10;
+                } else {
+                    blockParticle();
+                    yEnemyVel -= 0.1*facingDirection;
+                    yvel -= 1;
+                    xvel -= 1;
                 }
             }
         }
